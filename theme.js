@@ -6,7 +6,7 @@ export const lightTheme = {
     overviewOnImg: "#d2dae2",
     listTitle: GREEN_COLOR,
     title: "black",
-    overview: "#d2dae2",
+    overview: "#1e272e",
   },
 };
 

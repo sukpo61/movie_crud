@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useColorScheme } from "react-native";
+import { RefreshControl, useColorScheme } from "react-native";
 import styled from "@emotion/native";
 import Swiper from "react-native-swiper";
 import { SCREEN_HEIGHT } from "../utils";
@@ -28,6 +28,7 @@ const HViews = styled.ScrollView`
 const API_KEY = "558a876e694085f8a052d267914acde2";
 
 export default function Movies() {
+  const [refreshing, setRefreshing] = useState(false);
   const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
   const [topRatedMovies, setTopRatedMovies] = useState([]);
   const [upcomingMovies, setUpcomingMovies] = useState([]);
@@ -59,7 +60,14 @@ export default function Movies() {
 
   const getData = async () => {
     await Promise.all([getNowPlaying(), getTopRated(), getUpcoming()]);
+    console.log("getData");
     setIsLoading(false);
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getData();
+    setRefreshing(false);
   };
 
   useEffect(() => {
@@ -71,7 +79,11 @@ export default function Movies() {
   }
 
   return (
-    <Container>
+    <Container
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <Swiper
         autoplay
         showsPagination={false}

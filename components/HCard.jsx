@@ -10,6 +10,7 @@ const Poster = styled.Image`
   width: 100px;
   height: 150px;
   background-color: grey;
+  border-radius: 5px;
 `;
 const Title = styled.Text`
   font-size: 20px;
