@@ -2,16 +2,16 @@ import { useEffect, useState } from "react";
 import { useColorScheme } from "react-native";
 import styled from "@emotion/native";
 import Swiper from "react-native-swiper";
-import { getImgPath, SCREEN_HEIGHT } from "../utils";
+import { SCREEN_HEIGHT } from "../utils";
 import Loader from "../components/Loader";
 import Slide from "../components/Slide";
-import Vote from "../components/Vote";
-import { DARK_COLOR } from "../colors";
+import VCard from "../components/VCard";
+import HCard from "../components/HCard";
 
 const Container = styled.ScrollView``;
 
 const View = styled.View`
-  margin-bottom: 15px;
+  margin-bottom: 30px;
 `;
 
 const ListTitle = styled.Text`
@@ -25,36 +25,13 @@ const HViews = styled.ScrollView`
   padding-top: 15px;
 `;
 
-const Poster = styled.Image`
-  width: 120px;
-  height: 170px;
-  background-color: grey;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-`;
-const Title = styled.Text`
-  font-size: 13px;
-  font-weight: 600;
-  color: ${(props) => props.theme.color.titleOnImg};
-`;
-
-const VWrapper = styled.View`
-  margin-right: 10px;
-  background-color: ${DARK_COLOR};
-  border-radius: 5px;
-`;
-
-const Column = styled.View`
-  padding: 10px;
-`;
-
 const API_KEY = "558a876e694085f8a052d267914acde2";
 
 export default function Movies() {
   const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
   const [topRatedMovies, setTopRatedMovies] = useState([]);
+  const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const isDark = useColorScheme() === "dark";
 
   const getNowPlaying = async () => {
     const baseUrl = "https://api.themoviedb.org/3/movie/now_playing";
@@ -72,8 +49,16 @@ export default function Movies() {
     setTopRatedMovies(results);
   };
 
+  const getUpcoming = async () => {
+    const baseUrl = "https://api.themoviedb.org/3/movie/upcoming";
+    const { results } = await fetch(
+      `${baseUrl}?api_key=${API_KEY}&page=1`
+    ).then((res) => res.json());
+    setUpcomingMovies(results);
+  };
+
   const getData = async () => {
-    await Promise.all(getNowPlaying(), getTopRated());
+    await Promise.all([getNowPlaying(), getTopRated(), getUpcoming()]);
     setIsLoading(false);
   };
 
@@ -109,25 +94,18 @@ export default function Movies() {
           showsHorizontalScrollIndicator={false}
         >
           {topRatedMovies.map((movie) => (
-            <VWrapper key={movie.id}>
-              <Poster source={{ uri: getImgPath(movie.poster_path) }} />
-              <Column>
-                <Vote vote_average={movie.vote_average} />
-                <Title>
-                  {movie.title.slice(0, 11)}
-                  {movie.title.length > 11 && "..."}
-                </Title>
-              </Column>
-            </VWrapper>
+            <VCard key={movie.id} movie={movie} />
           ))}
         </HViews>
+      </View>
+      <View>
+        <ListTitle>Upcoming Movies</ListTitle>
+        <View style={{ padding: 20 }}>
+          {upcomingMovies.map((movie) => (
+            <HCard key={movie.id} movie={movie} />
+          ))}
+        </View>
       </View>
     </Container>
   );
 }
-
-<div>
-  <div>
-    <span></span>
-  </div>
-</div>;
