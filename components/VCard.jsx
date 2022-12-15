@@ -18,7 +18,6 @@ const Title = styled.Text`
 `;
 
 const VWrapper = styled.View`
-  margin-right: 10px;
   background-color: ${DARK_COLOR};
   border-radius: 5px;
 `;

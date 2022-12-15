@@ -4,7 +4,7 @@ import { getImgPath } from "../utils";
 
 const Row = styled.View`
   flex-direction: row;
-  margin-bottom: 30px;
+  margin-left: 20px;
 `;
 const Poster = styled.Image`
   width: 100px;

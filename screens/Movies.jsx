@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { RefreshControl, useColorScheme } from "react-native";
+import { FlatList, RefreshControl, useColorScheme } from "react-native";
 import styled from "@emotion/native";
 import Swiper from "react-native-swiper";
 import { SCREEN_HEIGHT } from "../utils";
@@ -21,10 +21,12 @@ const ListTitle = styled.Text`
   color: ${(props) => props.theme.color.listTitle};
 `;
 
-const HViews = styled.ScrollView`
-  padding-top: 15px;
+const HSeperator = styled.View`
+  width: 15px;
 `;
-
+const VSeperator = styled.View`
+  height: 15px;
+`;
 const API_KEY = "558a876e694085f8a052d267914acde2";
 
 export default function Movies() {
@@ -60,7 +62,6 @@ export default function Movies() {
 
   const getData = async () => {
     await Promise.all([getNowPlaying(), getTopRated(), getUpcoming()]);
-    console.log("getData");
     setIsLoading(false);
   };
 
@@ -79,45 +80,46 @@ export default function Movies() {
   }
 
   return (
-    <Container
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <Swiper
-        autoplay
-        showsPagination={false}
-        loop
-        containerStyle={{
-          width: "100%",
-          height: SCREEN_HEIGHT / 3,
-          marginBottom: 15,
-        }}
-      >
-        {nowPlayingMovies.map((movie) => (
-          <Slide key={movie.id} movie={movie} />
-        ))}
-      </Swiper>
-      <View>
-        <ListTitle>Top Rated Movies</ListTitle>
-        <HViews
-          contentContainerStyle={{ paddingHorizontal: 20 }}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        >
-          {topRatedMovies.map((movie) => (
-            <VCard key={movie.id} movie={movie} />
-          ))}
-        </HViews>
-      </View>
-      <View>
-        <ListTitle>Upcoming Movies</ListTitle>
-        <View style={{ padding: 20 }}>
-          {upcomingMovies.map((movie) => (
-            <HCard key={movie.id} movie={movie} />
-          ))}
+    <FlatList
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+      ListHeaderComponent={
+        <View>
+          <Swiper
+            autoplay
+            showsPagination={false}
+            loop
+            containerStyle={{
+              width: "100%",
+              height: SCREEN_HEIGHT / 3,
+              marginBottom: 15,
+            }}
+          >
+            {nowPlayingMovies.map((movie) => (
+              <Slide key={movie.id} movie={movie} />
+            ))}
+          </Swiper>
+          <ListTitle>Top Rated Movies</ListTitle>
+          <FlatList
+            horizontal
+            ItemSeparatorComponent={HSeperator}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingHorizontal: 20,
+              paddingTop: 15,
+              marginBottom: 30,
+            }}
+            data={topRatedMovies}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => <VCard movie={item} />}
+          />
+          <ListTitle>Upcoming Movies</ListTitle>
         </View>
-      </View>
-    </Container>
+      }
+      data={upcomingMovies}
+      keyExtractor={(item) => item.id}
+      ItemSeparatorComponent={VSeperator}
+      renderItem={({ item }) => <HCard movie={item} />}
+    />
   );
 }
