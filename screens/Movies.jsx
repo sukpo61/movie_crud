@@ -7,6 +7,8 @@ import Loader from "../components/Loader";
 import Slide from "../components/Slide";
 import VCard from "../components/VCard";
 import HCard from "../components/HCard";
+import { useQuery, useQueryClient } from "react-query";
+import { getNowPlaying, getTopRated, getUpcoming } from "../api";
 
 const Container = styled.ScrollView``;
 
@@ -27,53 +29,31 @@ const HSeperator = styled.View`
 const VSeperator = styled.View`
   height: 15px;
 `;
-const API_KEY = "558a876e694085f8a052d267914acde2";
 
 export default function Movies() {
   const [refreshing, setRefreshing] = useState(false);
-  const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
-  const [topRatedMovies, setTopRatedMovies] = useState([]);
-  const [upcomingMovies, setUpcomingMovies] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClinet = useQueryClient();
+  const { data: nowPlayingMovies, isLoading: isLoadingNowPlaying } = useQuery(
+    ["movie", "nowPlaying"],
+    getNowPlaying
+  );
+  const { data: topRatedMovies, isLoading: isLoadingTopRated } = useQuery(
+    ["movie", "topRated"],
+    getTopRated
+  );
+  const { data: upcomingMovies, isLoading: isLoadingUpcoming } = useQuery(
+    ["movie", "upComing"],
+    getUpcoming
+  );
 
-  const getNowPlaying = async () => {
-    const baseUrl = "https://api.themoviedb.org/3/movie/now_playing";
-    const { results } = await fetch(
-      `${baseUrl}?api_key=${API_KEY}&page=1`
-    ).then((res) => res.json());
-    setNowPlayingMovies(results);
-  };
-
-  const getTopRated = async () => {
-    const baseUrl = "https://api.themoviedb.org/3/movie/top_rated";
-    const { results } = await fetch(
-      `${baseUrl}?api_key=${API_KEY}&page=1`
-    ).then((res) => res.json());
-    setTopRatedMovies(results);
-  };
-
-  const getUpcoming = async () => {
-    const baseUrl = "https://api.themoviedb.org/3/movie/upcoming";
-    const { results } = await fetch(
-      `${baseUrl}?api_key=${API_KEY}&page=1`
-    ).then((res) => res.json());
-    setUpcomingMovies(results);
-  };
-
-  const getData = async () => {
-    await Promise.all([getNowPlaying(), getTopRated(), getUpcoming()]);
-    setIsLoading(false);
-  };
+  const isLoading =
+    isLoadingNowPlaying || isLoadingTopRated || isLoadingUpcoming;
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await getData();
+    await queryClinet.refetchQueries(["movie"]);
     setRefreshing(false);
   };
-
-  useEffect(() => {
-    getData();
-  }, []);
 
   if (isLoading) {
     return <Loader />;
@@ -95,7 +75,7 @@ export default function Movies() {
               marginBottom: 15,
             }}
           >
-            {nowPlayingMovies.map((movie) => (
+            {nowPlayingMovies.results.map((movie) => (
               <Slide key={movie.id} movie={movie} />
             ))}
           </Swiper>
@@ -109,14 +89,14 @@ export default function Movies() {
               paddingTop: 15,
               marginBottom: 30,
             }}
-            data={topRatedMovies}
+            data={topRatedMovies.results}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => <VCard movie={item} />}
           />
           <ListTitle>Upcoming Movies</ListTitle>
         </View>
       }
-      data={upcomingMovies}
+      data={upcomingMovies.results}
       keyExtractor={(item) => item.id}
       ItemSeparatorComponent={VSeperator}
       renderItem={({ item }) => <HCard movie={item} />}
