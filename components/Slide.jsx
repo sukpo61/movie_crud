@@ -4,6 +4,7 @@ import { StyleSheet } from "react-native";
 import { getImgPath } from "../utils";
 import { LinearGradient } from "expo-linear-gradient";
 import Vote from "./Vote";
+import { useNavigation } from "@react-navigation/native";
 
 const StyledView = styled.View`
   flex: 1;
@@ -15,7 +16,7 @@ const BackgroundImg = styled.Image`
   flex: 1;
 `;
 
-const Row = styled.View`
+const Row = styled.TouchableOpacity`
   flex: 1;
   flex-direction: row;
   align-items: flex-end;
@@ -49,6 +50,10 @@ const Rating = styled.Text`
 `;
 
 export default function Slide({ movie }) {
+  const { navigate } = useNavigation();
+  const goToDetail = () => {
+    navigate("Stack", { screen: "Detail", params: { movie } });
+  };
   return (
     <StyledView>
       <BackgroundImg
@@ -59,7 +64,7 @@ export default function Slide({ movie }) {
         style={StyleSheet.absoluteFill}
         colors={["transparent", "black"]}
       />
-      <Row>
+      <Row onPress={goToDetail}>
         <Poster source={{ uri: getImgPath(movie.poster_path) }} />
         <Column>
           <Title>{movie.title}</Title>

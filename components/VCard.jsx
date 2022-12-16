@@ -3,6 +3,7 @@ import styled from "@emotion/native";
 import { DARK_COLOR } from "../colors";
 import { getImgPath } from "../utils";
 import Vote from "./Vote";
+import { useNavigation } from "@react-navigation/native";
 
 const Poster = styled.Image`
   width: 120px;
@@ -17,7 +18,7 @@ const Title = styled.Text`
   color: ${(props) => props.theme.color.titleOnImg};
 `;
 
-const VWrapper = styled.View`
+const VWrapper = styled.TouchableOpacity`
   background-color: ${DARK_COLOR};
   border-radius: 5px;
 `;
@@ -27,8 +28,12 @@ const Column = styled.View`
 `;
 
 export default function VCard({ movie }) {
+  const { navigate } = useNavigation();
+  const goToDetail = () => {
+    navigate("Stack", { screen: "Detail", params: { movie } });
+  };
   return (
-    <VWrapper key={movie.id}>
+    <VWrapper onPress={goToDetail}>
       <Poster source={{ uri: getImgPath(movie.poster_path) }} />
       <Column>
         <Vote vote_average={movie.vote_average} />

@@ -16,3 +16,10 @@ export const getUpcoming = ({ pageParam }) =>
   fetch(`${BASE_URL}/upcoming?api_key=${API_KEY}&page=${pageParam}`).then(
     (res) => res.json()
   );
+
+export const getDetail = ({ queryKey }) => {
+  const [_, movieId] = queryKey;
+  return fetch(
+    `${BASE_URL}/${movieId}?api_key=${API_KEY}&append_to_response=videos`
+  ).then((res) => res.json());
+};

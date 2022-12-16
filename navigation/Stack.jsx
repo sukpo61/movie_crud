@@ -8,7 +8,6 @@ const NativeStack = createNativeStackNavigator();
 
 export default function Stack({ navigation: { goBack } }) {
   const isDark = useColorScheme() === "dark";
-  console.log("useColorScheme():", useColorScheme());
   return (
     <NativeStack.Navigator
       screenOptions={{

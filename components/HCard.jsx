@@ -1,8 +1,9 @@
 import React from "react";
 import styled from "@emotion/native";
 import { getImgPath } from "../utils";
+import { useNavigation } from "@react-navigation/native";
 
-const Row = styled.View`
+const Row = styled.TouchableOpacity`
   flex-direction: row;
   margin-left: 20px;
 `;
@@ -39,8 +40,13 @@ const Release = styled.Text`
 `;
 
 export default function HCard({ movie }) {
+  const { navigate } = useNavigation();
+  const goToDetail = () => {
+    navigate("Stack", { screen: "Detail", params: { movie } });
+  };
+
   return (
-    <Row>
+    <Row onPress={goToDetail}>
       <Poster source={{ uri: getImgPath(movie.poster_path) }} />
       <Column>
         <Title>{movie.title}</Title>
