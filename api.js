@@ -7,12 +7,12 @@ export const getNowPlaying = () =>
     res.json()
   );
 
-export const getTopRated = () =>
-  fetch(`${BASE_URL}/top_rated?api_key=${API_KEY}&page=1`).then((res) =>
-    res.json()
+export const getTopRated = ({ pageParam }) =>
+  fetch(`${BASE_URL}/top_rated?api_key=${API_KEY}&page=${pageParam}`).then(
+    (res) => res.json()
   );
 
-export const getUpcoming = () =>
-  fetch(`${BASE_URL}/upcoming?api_key=${API_KEY}&page=1`).then((res) =>
-    res.json()
+export const getUpcoming = ({ pageParam }) =>
+  fetch(`${BASE_URL}/upcoming?api_key=${API_KEY}&page=${pageParam}`).then(
+    (res) => res.json()
   );
