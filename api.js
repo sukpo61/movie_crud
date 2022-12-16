@@ -23,3 +23,8 @@ export const getDetail = ({ queryKey }) => {
     `${BASE_URL}/${movieId}?api_key=${API_KEY}&append_to_response=videos`
   ).then((res) => res.json());
 };
+
+// export const getReviews = ({ queryKey }) => {
+//   const [_, movieId] = queryKey;
+
+// }
