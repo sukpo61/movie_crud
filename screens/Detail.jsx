@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Linking, StyleSheet, useColorScheme } from "react-native";
+import {
+  FlatList,
+  Linking,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+} from "react-native";
 import styled from "@emotion/native";
 import { getImgPath, SCREEN_WIDTH } from "../utils";
 import { SCREEN_HEIGHT } from "../utils";
@@ -9,14 +17,17 @@ import { useQuery } from "react-query";
 import { getDetail } from "../api";
 import Loader from "../components/Loader";
 import Vote from "../components/Vote";
+import { Rating } from "react-native-ratings";
 import {
   addDoc,
   collection,
   getDocs,
   onSnapshot,
+  orderBy,
   query,
 } from "firebase/firestore";
 import { dbService } from "../firebase";
+import ReviewCard from "../components/ReviewCard";
 
 const Container = styled.ScrollView``;
 const View = styled.View`
@@ -55,28 +66,7 @@ const YoutubeList = styled.View`
   padding-left: 20px;
   padding-right: 20px;
 `;
-const Reviews = styled.ScrollView``;
-const Column = styled.View`
-  justify-content: space-between;
-  border-width: 1px;
-  border-color: ${(props) => props.theme.color.title};
-  width: ${SCREEN_WIDTH / 2.5 + "px"};
-  border-radius: 10px;
-  padding: 10px;
-  height: 250px;
-`;
-const AbovePart = styled.View``;
-const ReviewDate = styled.Text`
-  color: ${(props) => props.theme.color.title};
-  margin-bottom: 10px;
-`;
-const ReviewTitle = styled.Text`
-  color: ${(props) => props.theme.color.title};
-  margin-bottom: 10px;
-`;
-const ReviewContents = styled.Text`
-  color: ${(props) => props.theme.color.overview};
-`;
+
 const SectionTitle = styled.Text`
   color: ${(props) => props.theme.color.listTitle};
   font-size: 30px;
@@ -84,16 +74,65 @@ const SectionTitle = styled.Text`
   margin-left: 20px;
   margin-bottom: 20px;
 `;
-const AddReview = styled.TouchableOpacity``;
+const AddReview = styled.TouchableOpacity`
+  margin-left: 20px;
+  margin-right: 20px;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  border-width: 1px;
+  align-items: center;
+  border-color: ${(props) => props.theme.color.title};
+`;
 const TempText = styled.Text`
+  font-size: 20px;
   color: ${(props) => props.theme.color.title};
 `;
+const Backdrop = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
+const Dialog = styled.KeyboardAvoidingView`
+  background-color: ${(props) => props.theme.color.modalBg};
+  width: 80%;
+  height: 70%;
+  padding: 20px;
+  justify-content: space-between;
+  border-radius: 5px;
+`;
+const ModalTitle = styled.Text`
+  font-size: 20px;
+  font-weight: 600;
+  color: black;
+  margin-bottom: 10px;
+  margin-top: 10px;
+`;
+const TitleInput = styled.TextInput`
+  padding: 10px;
+  background-color: white;
+  border-radius: 5px;
+`;
+const ContentInput = styled(TitleInput)`
+  height: 300px;
+`;
+const ModalBtn = styled.Button``;
+const InputWrapper = styled.View``;
+const AddButton = styled.Button``;
+const HSeprator = styled.View`
+  width: 10px;
+`;
+
 export default function Detail({
   route: {
     params: { movie },
   },
 }) {
   const [reviews, setReviews] = useState([]);
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalContent, setModalContent] = useState("");
+  const [ratings, setRatings] = useState(0);
   const isDark = useColorScheme() === "dark";
   const openYoutube = async (key) => {
     const url = `https://www.youtube.com/watch?v=${key}`;
@@ -104,13 +143,17 @@ export default function Detail({
 
   const addReview = async () => {
     await addDoc(collection(dbService, "reviews"), {
-      title: "리뷰제목",
-      contents: "리뷰내용",
+      title: modalTitle,
+      contents: modalContent,
       createdAt: Date.now(),
-      rating: 8.5,
+      rating: ratings,
       userId: "user1",
       movieId: movie.id,
     });
+    setIsOpenModal(false);
+    setModalTitle("");
+    setModalContent("");
+    setRatings(0);
   };
 
   // useEffect(() => {
@@ -125,10 +168,14 @@ export default function Detail({
   //   getReviews();
   // }, []);
 
+  const getRatings = (rating) => {
+    setRatings(rating);
+  };
+
   useEffect(() => {
     const q = query(
-      collection(dbService, "reviews")
-      // orderBy("createdAt", "desc")
+      collection(dbService, "reviews"),
+      orderBy("createdAt", "desc")
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const newReviews = snapshot.docs.map((doc) => ({
@@ -171,31 +218,57 @@ export default function Detail({
         ))}
       </YoutubeList>
       <SectionTitle>Reviews</SectionTitle>
-      <AddReview onPress={addReview}>
-        <TempText>Add Review!</TempText>
+      <AddReview onPress={() => setIsOpenModal(true)}>
+        <TempText>Add Review</TempText>
       </AddReview>
-      <Reviews
-        horizontal
+      <FlatList
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 50 }}
-      >
-        {reviews.map((review) => {
-          if (review.movieId === movie.id) {
-            return (
-              <Column key={review.id}>
-                <AbovePart>
-                  <ReviewDate>
-                    {new Date(review.createdAt).toLocaleDateString("kr")}
-                  </ReviewDate>
-                  <ReviewTitle>{review.title}</ReviewTitle>
-                  <ReviewContents>{review.contents}</ReviewContents>
-                </AbovePart>
-                <Vote vote_average={8.3} />
-              </Column>
-            );
-          }
-        })}
-      </Reviews>
+        contentContainerStyle={{ paddingHorizontal: 20, marginBottom: 50 }}
+        keyExtractor={(item) => item.id}
+        horizontal
+        data={reviews}
+        ItemSeparatorComponent={HSeprator}
+        renderItem={({ item }) => <ReviewCard review={item} />}
+      />
+      <Modal visible={isOpenModal} transparent animationType="slide">
+        <Backdrop>
+          <Dialog>
+            <InputWrapper>
+              <ModalTitle>평가</ModalTitle>
+              <Rating
+                startingValue={0}
+                style={{
+                  alignItems: "flex-start",
+                }}
+                onFinishRating={getRatings}
+                ratingCount={10}
+                imageSize={20}
+                tintColor="#d2dae2"
+              />
+              <ModalTitle>제목</ModalTitle>
+              <TitleInput
+                value={modalTitle}
+                onChangeText={(text) => setModalTitle(text)}
+              />
+              <ModalTitle>내용</ModalTitle>
+              <ContentInput
+                value={modalContent}
+                onChangeText={(text) => setModalContent(text)}
+                multiline
+                maxLength={300}
+              />
+            </InputWrapper>
+            <Row style={{ justifyContent: "space-between" }}>
+              <ModalBtn onPress={() => setIsOpenModal(false)} title="Cancel" />
+              <ModalBtn
+                disabled={!ratings || !modalTitle || !modalContent}
+                onPress={addReview}
+                title="Add Review"
+              />
+            </Row>
+          </Dialog>
+        </Backdrop>
+      </Modal>
     </Container>
   );
 }

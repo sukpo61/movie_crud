@@ -7,6 +7,7 @@ export const lightTheme = {
     listTitle: GREEN_COLOR,
     title: "black",
     overview: "#1e272e",
+    modalBg: "#d2dae2",
   },
 };
 
@@ -17,5 +18,6 @@ export const darkTheme = {
     listTitle: YELLOW_COLOR,
     title: "white",
     overview: "#d2dae2",
+    modalBg: "#d2dae2",
   },
 };
