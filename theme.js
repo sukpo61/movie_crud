@@ -8,6 +8,7 @@ export const lightTheme = {
     title: "black",
     overview: "#1e272e",
     modalBg: "#d2dae2",
+    inputText: "white",
   },
 };
 
@@ -19,5 +20,6 @@ export const darkTheme = {
     title: "white",
     overview: "#d2dae2",
     modalBg: "#d2dae2",
+    inputText: "black",
   },
 };

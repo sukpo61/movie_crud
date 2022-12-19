@@ -2,9 +2,10 @@ import React from "react";
 import styled from "@emotion/native";
 import { SCREEN_WIDTH } from "../utils";
 import Vote from "./Vote";
+import { useNavigation } from "@react-navigation/native";
 
 const Reviews = styled.ScrollView``;
-const Column = styled.View`
+const Column = styled.TouchableOpacity`
   justify-content: space-between;
   border-width: 1px;
   border-color: ${(props) => props.theme.color.title};
@@ -27,9 +28,20 @@ const ReviewContents = styled.Text`
   line-height: 18px;
 `;
 
-export default function ReviewCard({ review }) {
+export default function ReviewCard({ review, movie }) {
+  const { navigate } = useNavigation();
+  const goToReview = () => {
+    navigate("Review", {
+      id: review.id,
+      title: review.title,
+      contents: review.contents,
+      rating: review.rating,
+      movie,
+    });
+  };
+
   return (
-    <Column>
+    <Column onPress={goToReview}>
       <AbovePart>
         <ReviewDate>
           {new Date(review.createdAt).toLocaleDateString("kr")}

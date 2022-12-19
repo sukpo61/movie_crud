@@ -9,6 +9,8 @@ import VCard from "../components/VCard";
 import HCard from "../components/HCard";
 import { useInfiniteQuery, useQuery, useQueryClient } from "react-query";
 import { getNowPlaying, getTopRated, getUpcoming } from "../api";
+// import { onAuthStateChanged } from "firebase/auth";
+import { authService } from "../firebase";
 
 const Container = styled.ScrollView``;
 
