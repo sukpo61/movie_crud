@@ -10,7 +10,7 @@ const TitleInput = styled.TextInput`
   border-radius: 5px;
 `;
 const ContentInput = styled(TitleInput)`
-  height: 300px;
+  height: 200px;
 `;
 const ModalBtn = styled.Button``;
 const InputWrapper = styled.View``;

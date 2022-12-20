@@ -33,6 +33,7 @@ export default function Stack({
   return (
     <NativeStack.Navigator
       screenOptions={{
+        headerTitleAlign: "center",
         headerLeft: () => (
           <TouchableOpacity onPress={() => goBack()}>
             <Text style={{ color: isDark ? YELLOW_COLOR : GREEN_COLOR }}>

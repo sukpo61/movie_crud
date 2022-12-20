@@ -17,6 +17,7 @@ export default function Tabs() {
         headerTintColor: isDark ? YELLOW_COLOR : GREEN_COLOR,
         tabBarActiveTintColor: isDark ? YELLOW_COLOR : GREEN_COLOR,
         tabBarLabelPosition: "beside-icon",
+        headerTitleAlign: "center",
       }}
     >
       <Tab.Screen
