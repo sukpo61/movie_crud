@@ -19,7 +19,8 @@ const TitleEdit = styled.TextInput`
   padding: 10px 15px;
 `;
 const ContentEdit = styled(TitleEdit)`
-  height: 300px;
+  min-height: 150px;
+  margin-bottom: 50px;
 `;
 
 const Container = styled.ScrollView`
@@ -239,6 +240,7 @@ export default function Reviewedit({
       <SectionTitle>내용</SectionTitle>
 
       <ContentEdit
+        textAlignVertical="top"
         value={newContents}
         onChangeText={(text) => setNewContents(text)}
         multiline

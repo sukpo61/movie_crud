@@ -10,7 +10,7 @@ const TitleInput = styled.TextInput`
   border-radius: 5px;
 `;
 const ContentInput = styled(TitleInput)`
-  height: 200px;
+  min-height: 100px;
 `;
 const ModalBtn = styled.Button``;
 const InputWrapper = styled.View``;
@@ -85,6 +85,7 @@ export default function ReviewModal({ isOpenModal, setIsOpenModal, movieId }) {
             />
             <ModalTitle>내용</ModalTitle>
             <ContentInput
+              textAlignVertical="top"
               value={modalContent}
               onChangeText={(text) => setModalContent(text)}
               multiline
