@@ -28,15 +28,12 @@ const ReviewContents = styled.Text`
   line-height: 18px;
 `;
 
-export default function ReviewCard({ review, movie }) {
+export default function ReviewCard({ review }) {
   const { navigate } = useNavigation();
   const goToReview = () => {
     navigate("Review", {
-      id: review.id,
-      title: review.title,
-      contents: review.contents,
-      rating: review.rating,
-      movie,
+      review,
+      from: "Detail",
     });
   };
 

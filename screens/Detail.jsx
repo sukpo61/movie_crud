@@ -17,7 +17,7 @@ import ReviewModal from "../components/ReviewModal";
 export default function Detail({
   navigation: { navigate },
   route: {
-    params: { movie },
+    params: { movieId },
   },
 }) {
   const [reviews, setReviews] = useState([]);
@@ -29,7 +29,7 @@ export default function Detail({
     await Linking.openURL(url);
   };
 
-  const { data, isLoading } = useQuery(["movie", movie.id], getDetail);
+  const { data, isLoading } = useQuery(["movie", movieId], getDetail);
 
   const handleAdding = async () => {
     const isLogin = !!authService.currentUser;
@@ -64,7 +64,7 @@ export default function Detail({
       }));
       setReviews(newReviews);
     });
-    return () => unsubscribe();
+    return unsubscribe;
   }, []);
 
   if (isLoading) {
@@ -76,15 +76,15 @@ export default function Detail({
       <View>
         <BackdropImg
           style={StyleSheet.absoluteFill}
-          source={{ uri: getImgPath(movie.backdrop_path) }}
+          source={{ uri: getImgPath(data.backdrop_path) }}
         />
         <LinearGradient
           style={StyleSheet.absoluteFill}
           colors={["transparent", "black"]}
         />
-        <Title>{movie.title}</Title>
+        <Title>{data.title}</Title>
       </View>
-      <Overview>{movie.overview}</Overview>
+      <Overview>{data.overview}</Overview>
       <YoutubeList>
         {data?.videos?.results.map((video) => (
           <Row key={video.key} onPress={() => openYoutube(video.key)}>
@@ -103,19 +103,23 @@ export default function Detail({
       </AddReview>
       <FlatList
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 20, marginBottom: 50 }}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          marginBottom: 50,
+          justifyContent: "flex-start",
+        }}
         keyExtractor={(item) => item.id}
         horizontal
         data={reviews}
         ItemSeparatorComponent={HSeprator}
         renderItem={({ item }) => {
-          if (item.movieId === movie.id) {
-            return <ReviewCard movie={movie} review={item} />;
+          if (item.movieId === movieId) {
+            return <ReviewCard review={item} />;
           }
         }}
       />
       <ReviewModal
-        movie={movie}
+        movieId={movieId}
         isOpenModal={isOpenModal}
         setIsOpenModal={setIsOpenModal}
       />

@@ -30,7 +30,7 @@ const Column = styled.View`
 export default function VCard({ movie }) {
   const { navigate } = useNavigation();
   const goToDetail = () => {
-    navigate("Stack", { screen: "Detail", params: { movie } });
+    navigate("Stack", { screen: "Detail", params: { movieId: movie.id } });
   };
   return (
     <VWrapper onPress={goToDetail}>

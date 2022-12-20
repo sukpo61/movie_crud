@@ -52,7 +52,7 @@ const BtnTitle = styled.Text`
 export default function Reviewedit({
   navigation,
   route: {
-    params: { id, contents, title, rating, movie },
+    params: { review, from },
   },
 }) {
   const isDark = useColorScheme() === "dark";
@@ -67,8 +67,12 @@ export default function Reviewedit({
         text: "OK. Delete it.",
         onPress: async () => {
           try {
-            await deleteDoc(doc(dbService, "reviews", id));
-            navigation.navigate("Detail", { movie });
+            await deleteDoc(doc(dbService, "reviews", review.id));
+            if (from === "Detail") {
+              navigation.navigate("Detail", { movieId: review.movieId });
+            } else if (from === "My") {
+              navigation.navigate("Tabs", { screen: "My" });
+            }
           } catch (err) {
             console.log("err:", err);
           }
@@ -108,16 +112,34 @@ export default function Reviewedit({
           text: "OK. Edit it",
           onPress: async () => {
             try {
-              await updateDoc(doc(dbService, "reviews", id), editingObj);
+              await updateDoc(doc(dbService, "reviews", review.id), editingObj);
               setNewContents("");
               setNewTitle("");
               setRatings(0);
-              navigation.navigate("Review", {
-                id,
-                contents: newContents || contents,
-                title: newTitle || title,
-                rating: ratings || rating,
-              });
+              if (from === "Detail") {
+                navigation.reset({
+                  index: 1,
+                  routes: [
+                    {
+                      name: "Detail",
+                      params: { movieId: review.movieId },
+                    },
+                    {
+                      name: "Review",
+                      params: { review: { ...review, ...editingObj } },
+                    },
+                  ],
+                });
+              } else if (from === "My") {
+                navigation.reset({
+                  routes: [
+                    {
+                      name: "Tabs",
+                      params: { screen: "My" },
+                    },
+                  ],
+                });
+              }
             } catch (err) {
               console.log("err:", err);
             }
@@ -158,7 +180,7 @@ export default function Reviewedit({
       <SectionTitle>평점</SectionTitle>
 
       <Rating
-        startingValue={rating}
+        startingValue={review.rating}
         style={{
           alignItems: "flex-start",
           marginBottom: 20,
@@ -175,7 +197,7 @@ export default function Reviewedit({
         value={newTitle}
         placeholderTextColor="#d2dae2"
         onChangeText={onChangeTitle}
-        placeholder={title}
+        placeholder={review.title}
         maxLength={30}
       />
 
@@ -187,7 +209,7 @@ export default function Reviewedit({
         multiline
         maxLength={300}
         placeholderTextColor="#d2dae2"
-        placeholder={contents}
+        placeholder={review.contents}
       />
     </Container>
   );

@@ -52,7 +52,7 @@ const Rating = styled.Text`
 export default function Slide({ movie }) {
   const { navigate } = useNavigation();
   const goToDetail = () => {
-    navigate("Stack", { screen: "Detail", params: { movie } });
+    navigate("Stack", { screen: "Detail", params: { movieId: movie.id } });
   };
   return (
     <StyledView>

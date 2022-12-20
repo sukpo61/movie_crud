@@ -37,13 +37,13 @@ export const Content = styled.Text`
 export default function Review({
   navigation,
   route: {
-    params: { id, contents, rating, title, movie },
+    params: { review, from },
   },
 }) {
   const isDark = useColorScheme() === "dark";
 
   const onEdit = () => {
-    navigation.navigate("Reviewedit", { id, contents, rating, title, movie });
+    navigation.navigate("Reviewedit", { review, from });
   };
 
   useEffect(() => {
@@ -69,15 +69,15 @@ export default function Review({
     <Container>
       <SectionTitle>평점</SectionTitle>
 
-      <Ratings>⭐️ {rating} / 10</Ratings>
+      <Ratings>⭐️ {review.rating} / 10</Ratings>
 
       <SectionTitle>제목</SectionTitle>
 
-      <Title>{title}</Title>
+      <Title>{review.title}</Title>
 
       <SectionTitle>내용</SectionTitle>
 
-      <Content>{contents}</Content>
+      <Content>{review.contents}</Content>
     </Container>
   );
 }

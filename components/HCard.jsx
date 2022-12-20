@@ -42,7 +42,7 @@ const Release = styled.Text`
 export default function HCard({ movie }) {
   const { navigate } = useNavigation();
   const goToDetail = () => {
-    navigate("Stack", { screen: "Detail", params: { movie } });
+    navigate("Stack", { screen: "Detail", params: { movieId: movie.id } });
   };
 
   return (

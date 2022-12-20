@@ -41,7 +41,7 @@ const Row = styled.TouchableOpacity`
   margin-bottom: 10px;
 `;
 
-export default function ReviewModal({ isOpenModal, setIsOpenModal, movie }) {
+export default function ReviewModal({ isOpenModal, setIsOpenModal, movieId }) {
   const [modalTitle, setModalTitle] = useState("");
   const [modalContent, setModalContent] = useState("");
   const [ratings, setRatings] = useState(0);
@@ -55,7 +55,7 @@ export default function ReviewModal({ isOpenModal, setIsOpenModal, movie }) {
       createdAt: Date.now(),
       rating: ratings,
       userId: authService.currentUser?.uid,
-      movieId: movie.id,
+      movieId,
     });
     setIsOpenModal(false);
     setModalTitle("");

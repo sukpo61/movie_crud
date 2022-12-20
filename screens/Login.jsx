@@ -135,6 +135,8 @@ export default function Login({ navigation: { goBack, setOptions } }) {
         onChangeText={(text) => setPw(text)}
         placeholderTextColor={isDark ? "#547ea7" : "#d2dae2"}
         textContentType="password"
+        returnKeyType="send"
+        secureTextEntry={true}
         placeholder="Enter your password"
       />
       <LoginButton onPress={handleLogin}>
