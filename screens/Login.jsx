@@ -53,17 +53,17 @@ export default function Login({ navigation: { goBack, setOptions } }) {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const isDark = useColorScheme() === "dark";
-  const handleLogin = () => {
-    // 유효성 검사
+
+  const validateInputs = () => {
     if (!email) {
       alert("email을 입력해주세요.");
       emailRef.current.focus();
-      return;
+      return true;
     }
     if (!pw) {
       alert("password를 입력해주세요.");
       pwRef.current.focus();
-      return;
+      return true;
     }
     const matchedEmail = email.match(emailRegex);
     const matchedPw = pw.match(pwRegex);
@@ -71,11 +71,17 @@ export default function Login({ navigation: { goBack, setOptions } }) {
     if (matchedEmail === null) {
       alert("이메일 형식에 맞게 입력해 주세요.");
       emailRef.current.focus();
-      return;
+      return true;
     }
     if (matchedPw === null) {
       alert("비밀번호는 8자리 이상 영문자, 숫자, 특수문자 조합이어야 합니다.");
       pwRef.current.focus();
+      return true;
+    }
+  };
+  const handleLogin = () => {
+    // 유효성 검사
+    if (validateInputs()) {
       return;
     }
 
@@ -100,6 +106,12 @@ export default function Login({ navigation: { goBack, setOptions } }) {
   };
 
   const handleRegister = () => {
+    // 유효성 검사
+    if (validateInputs()) {
+      return;
+    }
+
+    // 회원가입 요청
     createUserWithEmailAndPassword(authService, email, pw)
       .then(() => {
         console.log("로그인성공");
