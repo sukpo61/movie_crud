@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { View, Text, useColorScheme, FlatList } from "react-native";
 import styled from "@emotion/native";
 import { authService, dbService } from "../firebase";
@@ -12,6 +12,7 @@ import {
   where,
 } from "firebase/firestore";
 import Vote from "../components/Vote";
+import { useFocusEffect } from "@react-navigation/native";
 
 const Container = styled.ScrollView`
   padding: 20px;
@@ -53,33 +54,56 @@ const VSeperator = styled.View`
   height: 10px;
 `;
 
-export default function My({ navigation: { navigate } }) {
+export default function My({ navigation: { navigate, reset } }) {
   const [reviews, setReviews] = useState([]);
-  const isDark = useColorScheme() === "dark";
-  const userId = authService.currentUser?.uid;
+
   const goToReview = (theReview) => {
     navigate("Stack", {
       screen: "Review",
       params: { review: theReview, from: "My" },
     });
   };
+  useFocusEffect(
+    useCallback(() => {
+      if (!authService.currentUser) {
+        // 비로그인 상태
+        // navigate("Stack", { screen: "Login" });
+        reset({
+          index: 1,
+          routes: [
+            {
+              name: "Tabs",
+              params: {
+                screen: "Movies",
+              },
+            },
+            {
+              name: "Stack",
+              params: {
+                screen: "Login",
+              },
+            },
+          ],
+        });
+        return;
+      }
 
-  useEffect(() => {
-    // getReviews();
-    const q = query(
-      collection(dbService, "reviews"),
-      orderBy("createdAt", "desc"),
-      where("userId", "==", userId)
-    );
-    const unsubcribe = onSnapshot(q, (snapshot) => {
-      const newReviews = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setReviews(newReviews);
-    });
-    return unsubcribe;
-  }, []);
+      const q = query(
+        collection(dbService, "reviews"),
+        orderBy("createdAt", "desc"),
+        where("userId", "==", authService.currentUser?.uid)
+      );
+      const unsubcribe = onSnapshot(q, (snapshot) => {
+        const newReviews = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setReviews(newReviews);
+      });
+      return unsubcribe;
+    }, [])
+  );
+
   return (
     <FlatList
       contentContainerStyle={{ padding: 20 }}
