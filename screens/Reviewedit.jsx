@@ -8,6 +8,9 @@ import { GREEN_COLOR, YELLOW_COLOR } from "../colors";
 import { AntDesign } from "@expo/vector-icons";
 import { Alert } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useMutation } from "react-query";
+import { deleteReview, editReview } from "../api";
+import Loader from "../components/Loader";
 
 const TitleEdit = styled.TextInput`
   width: 100%;
@@ -60,6 +63,32 @@ export default function Reviewedit({
   const [newTitle, setNewTitle] = useState("");
   const [newContents, setNewContents] = useState("");
 
+  const { isLoading: isLoadingDeleting, mutate: removeReview } = useMutation(
+    ["deleteReview", review.id],
+    (body) => deleteReview(body),
+    {
+      onSuccess: () => {
+        console.log("삭제성공");
+      },
+      onError: (err) => {
+        console.log("err in delete:", err);
+      },
+    }
+  );
+
+  const { isLoading: isLoadingEditing, mutate: reviseReview } = useMutation(
+    ["editReview", review.id],
+    (body) => editReview(body),
+    {
+      onSuccess: () => {
+        console.log("수정성공");
+      },
+      onError: (err) => {
+        console.log("err in edit:", err);
+      },
+    }
+  );
+
   const onDelete = async () => {
     Alert.alert("리뷰 삭제", "정말 현재 리뷰를 삭제하시겠습니까?", [
       { text: "cancel", style: "destructive" },
@@ -67,7 +96,8 @@ export default function Reviewedit({
         text: "OK. Delete it.",
         onPress: async () => {
           try {
-            await deleteDoc(doc(dbService, "reviews", review.id));
+            // await deleteDoc(doc(dbService, "reviews", review.id));
+            await removeReview(review.id);
             if (from === "Detail") {
               navigation.navigate("Detail", { movieId: review.movieId });
             } else if (from === "My") {
@@ -112,7 +142,8 @@ export default function Reviewedit({
           text: "OK. Edit it",
           onPress: async () => {
             try {
-              await updateDoc(doc(dbService, "reviews", review.id), editingObj);
+              // await updateDoc(doc(dbService, "reviews", review.id), editingObj);
+              await reviseReview({ reviewId: review.id, editingObj });
               setNewContents("");
               setNewTitle("");
               setRatings(0);
@@ -163,6 +194,10 @@ export default function Reviewedit({
       },
     });
   }, []);
+
+  if (isLoadingDeleting || isLoadingEditing) {
+    return <Loader />;
+  }
 
   return (
     <Container>

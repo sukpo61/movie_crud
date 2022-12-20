@@ -1,3 +1,6 @@
+import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { dbService } from "./firebase";
+
 const BASE_URL = "https://api.themoviedb.org/3/movie";
 
 const API_KEY = "558a876e694085f8a052d267914acde2";
@@ -24,7 +27,10 @@ export const getDetail = ({ queryKey }) => {
   ).then((res) => res.json());
 };
 
-// export const getReviews = ({ queryKey }) => {
-//   const [_, movieId] = queryKey;
+export const deleteReview = async (reviewId) => {
+  await deleteDoc(doc(dbService, "reviews", reviewId));
+};
 
-// }
+export const editReview = async ({ reviewId, editingObj }) => {
+  await updateDoc(doc(dbService, "reviews", reviewId), editingObj);
+};
